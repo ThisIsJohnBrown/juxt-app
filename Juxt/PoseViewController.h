@@ -7,21 +7,22 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MaskView.h"
+#import "Pose.h"
+#import "MeldView.h"
 
-@interface PoseViewController : UIViewController
+@interface PoseViewController : UIViewController <UIScrollViewDelegate>
+
+@property (nonatomic,strong) NSManagedObjectContext *managedObjectContext;
 
 @property (nonatomic, strong) UIImage *before;
 @property (nonatomic, strong) UIImage *after;
-@property (weak, nonatomic) IBOutlet UIImageView *imageViewBefore;
-@property (weak, nonatomic) IBOutlet UIImageView *imageViewAfter;
-@property (weak, nonatomic) IBOutlet MaskView *masker;
-@property (weak, nonatomic) IBOutlet UIView *imageContainer;
-@property (weak, nonatomic) IBOutlet UISlider *slider;
 
-- (void)meld;
+@property (nonatomic, strong) Pose *pose;
+- (IBAction)sliderMoved:(UISlider *)sender;
+- (IBAction)switchImages:(UIButton *)sender;
+- (IBAction)changeDirection:(UIButton *)sender;
+- (IBAction)save:(UIButton *)sender;
 
-- (IBAction)handlePan:(UIPanGestureRecognizer *)recognizer;
-- (IBAction)handlePinch:(UIPinchGestureRecognizer *)recognizer;
+@property (strong, nonatomic) MeldView *meldView;
 
 @end

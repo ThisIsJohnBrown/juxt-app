@@ -8,17 +8,18 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "Pose.h"
 
-@interface ViewController : UIViewController <UIImagePickerControllerDelegate,
+@interface SelectionViewController : UIViewController <UIImagePickerControllerDelegate,
 UINavigationControllerDelegate>
+
+@property (nonatomic,strong) NSManagedObjectContext *managedObjectContext;
 
 @property BOOL newMedia;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewBefore;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAfter;
 @property (weak, nonatomic) IBOutlet UIButton *readyButton;
 
-- (void) useCameraRollButton:(id)sender;
-
-@property (nonatomic, retain) NSManagedObjectContext *context;
+@property (nonatomic, strong) Pose *pose;
 
 @end

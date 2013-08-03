@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="2057" systemVersion="12D78" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="PoseInfo" syncable="YES">
-        <attribute name="after" attributeType="String" syncable="YES"/>
-        <attribute name="before" attributeType="String" syncable="YES"/>
+    <entity name="Pose" representedClassName="Pose" syncable="YES">
+        <attribute name="afterPath" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="beforePath" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="direction" optional="YES" attributeType="String" defaultValueString="left" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="perc" optional="YES" attributeType="Float" defaultValueString="0.5" syncable="YES"/>
     </entity>
     <elements>
-        <element name="PoseInfo" positionX="-3350" positionY="18" width="128" height="73"/>
+        <element name="Pose" positionX="-11394" positionY="-3303" width="128" height="118"/>
     </elements>
 </model>

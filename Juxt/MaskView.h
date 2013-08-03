@@ -11,6 +11,10 @@
 @interface MaskView : UIView
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic) CGFloat perc;
-@property (nonatomic) NSString *type;
-- (void)redraw;
+@property (nonatomic) NSString *direction;
+- (void)redraw:(float)maskPercentage;
+- (void)nextDirection;
+
+-(id)initWithPerc:(float)perc andDirection:(NSString *)direction;
+
 @end

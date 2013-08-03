@@ -6,21 +6,82 @@
 //  Copyright (c) 2013 John Brown. All rights reserved.
 //
 
+#import "AppDelegate.h"
 #import "PoseViewController.h"
-#import "MeldViewController.h"
-#import <QuartzCore/QuartzCore.h>
+#import "Pose.h"
+#import "MaskView.h"
+#import <Social/Social.h>
 
 @interface PoseViewController ()
+
 @property (nonatomic) CGPoint slideStart;
+@property (nonatomic, strong) MaskView *masker;
+@property (nonatomic, strong) UIImageView *imageViewBefore;
+@property (nonatomic, strong) UIImageView *imageViewAfter;
+@property (nonatomic) float maximumZoomScaleBefore;
+@property (nonatomic) float mininumZoomScaleBefore;
+
+@property (nonatomic, strong) UIView *meldOverlayView;
+@property (nonatomic, strong) UIImageView *selectedImage;
+@property (nonatomic) float maskPercentage;
+
+@property (nonatomic, strong) UIView *beforeHolderView;
+@property (nonatomic, strong) UIImageView *beforeImageView;
+
+@property (nonatomic, strong) UIView *afterHolderView;
+@property (nonatomic, strong) UIImageView *afterImageView;
+
+//@property(nonatomic, readonly) UIPanGestureRecognizer *panGestureRecognizer;
+
 @end
 
 @implementation PoseViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (IBAction)sliderMoved:(UISlider *)sender {
+    [self.meldView afterOpacity:[sender value]];
+}
+
+- (IBAction)switchImages:(UIButton *)sender {
+    [self.meldView switchImages];
+}
+
+- (IBAction)changeDirection:(UIButton *)sender {
+    [self.meldView nextDirection];
+}
+
+- (IBAction)save:(UIButton *)sender {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    NSError *error;
+    [self.meldView savePose];
+    
+    if (![context save:&error]) {
+        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
+    }
+}
+
+- (IBAction)tweetTapped:(id)sender {
+    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
+    {
+        SLComposeViewController *tweetSheet = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+        [tweetSheet setInitialText:@"Tweeting from my own app! :)"];
+        [self presentViewController:tweetSheet animated:YES completion:nil];
+    }
+    else
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]
+                                  initWithTitle:@"Sorry"
+                                  message:@"You can't send a tweet right now, make sure your device has an internet connection and you have at least one Twitter account setup"
+                                  delegate:self
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil];
+        [alertView show];
+    }
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        
     }
     return self;
 }
@@ -28,67 +89,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
     
-    
+    self.meldView = [[MeldView alloc] initWithPose:self.pose inFrame:CGRectMake(0, 0, 320, 320) withInteractions:YES];
+    [self.view addSubview:self.meldView];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    //[self.masker setHidden:NO];
-    //[self meld];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
 }
-
-- (IBAction)meldAction:(id)sender {
-    UIImage *oldBefore = self.imageViewBefore.image;
-    UIImage *oldAfter = self.imageViewAfter.image;
-    
-    self.imageViewBefore.image = oldAfter;
-    self.imageViewAfter.image = oldBefore;
-}
-
-- (void)meld {
-    if (!self.imageViewAfter.layer.mask) {
-        self.imageViewAfter.layer.mask = self.masker.layer;
-    } else {
-        self.imageViewAfter.layer.mask = nil;
-    }
-}
-
-- (IBAction)switchImages:(id)sender {
-    for (int i= 0; i < self.childViewControllers.count; i++) {
-        if ([(UIViewController *)self.childViewControllers[i] isKindOfClass:[MeldViewController class]]) {
-            [(MeldViewController *)self.childViewControllers[i] switchImages];
-        }
-    }
-}
-
-- (IBAction)slide:(id)sender {
-    for (int i= 0; i < self.childViewControllers.count; i++) {
-        if ([(UIViewController *)self.childViewControllers[i] isKindOfClass:[MeldViewController class]]) {
-            ((MeldViewController *)self.childViewControllers[i]).masker.alpha = [(UISlider *)sender value];
-        }
-    }
-}
-
-
-- (IBAction)handlePinch:(UIPinchGestureRecognizer *)recognizer {
-    self.imageViewAfter.transform = CGAffineTransformScale(self.imageViewAfter.transform, recognizer.scale, recognizer.scale);
-    recognizer.scale = 1;
-}
-
-- (IBAction)handlePan:(UIPanGestureRecognizer *)recognizer {
-
-    CGPoint translation = [recognizer translationInView:self.view];
-    if (recognizer.state == UIGestureRecognizerStateBegan) {
-        self.slideStart = CGPointMake(translation.x, translation.y);
-    }
-    self.masker.perc = ([recognizer locationInView:recognizer.view].x-[recognizer locationInView:recognizer.view].y)/ recognizer.view.bounds.size.width;
-    [self.masker redraw];
-    
-    
-}
-
-
-
 
 @end

@@ -2,25 +2,22 @@
 //  MeldView.h
 //  Juxt
 //
-//  Created by John Brown on 7/29/13.
+//  Created by John Brown on 8/2/13.
 //  Copyright (c) 2013 John Brown. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-#import "MaskView.h"
+#import "Pose.h"
 
 @interface MeldView : UIView
 
-@property (nonatomic, strong) UIImage *before;
-@property (nonatomic, strong) UIImage *after;
-@property (weak, nonatomic) UIImageView *imageViewBefore;
-@property (weak, nonatomic) UIImageView *imageViewAfter;
-@property (weak, nonatomic) MaskView *masker;
+@property (strong, nonatomic) Pose *pose;
 
-- (void)meld;
-- (void)trace;
+-(id)initWithPose:(Pose *)pose inFrame:(CGRect)frame withInteractions:(BOOL)interactions;
 
-- (IBAction)handlePan:(UIPanGestureRecognizer *)recognizer;
-- (IBAction)handlePinch:(UIPinchGestureRecognizer *)recognizer;
+- (void)afterOpacity:(float)opacity;
+- (void)nextDirection;
+- (void)switchImages;
 
+- (void)savePose;
 @end

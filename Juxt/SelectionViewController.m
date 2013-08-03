@@ -6,18 +6,26 @@
 //  Copyright (c) 2013 John Brown. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "SelectionViewController.h"
 #import "PoseViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "AppDelegate.h"
 #import <CoreData/CoreData.h>
+#import "Pose.h"
 
-@interface ViewController ()
+@interface SelectionViewController ()
 @property (nonatomic) BOOL *before;
 @end
 
-@implementation ViewController
+@implementation SelectionViewController
+
+- (Pose *)pose {
+    if (!_pose) {
+        _pose = [[Pose alloc] init];
+    }
+    return _pose;
+}
 
 - (IBAction)useCameraRollBefore:(id)sender {
     self.before = YES;
@@ -27,22 +35,6 @@
 - (IBAction)useCameraRollAfter:(id)sender {
     self.before = NO;
     [self useCameraRoll];
-}
-
-- (NSManagedObjectContext *)managedObjectContext {
-    NSManagedObjectContext *context = nil;
-    id delegate = [[UIApplication sharedApplication] delegate];
-    if ([delegate performSelector:@selector(managedObjectContext)]) {
-        context = [delegate managedObjectContext];
-    }
-    return context;
-}
-
-- (NSManagedObjectContext *)context {
-    if (!_context) {
-        _context = [self managedObjectContext];
-    }
-    return _context;
 }
 
 
@@ -55,6 +47,20 @@
 //    [self.context save:&error];
 //    
 //    NSLog(@"%@ -- %@", error, [error localizedDescription]);
+    
+    self.imageViewBefore.image = [UIImage imageNamed:self.pose.beforePath];
+    self.imageViewAfter.image = [UIImage imageNamed:self.pose.afterPath];
+    
+    [self.imageViewBefore setHidden:NO];
+    [self.imageViewAfter setHidden:NO];
+    
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+    [self.imageViewBefore addGestureRecognizer:tapRecognizer];
+}
+
+- (void)tap:(UITapGestureRecognizer *)recognizer {
+    NSLog(@"asdasdf");
+    [self useCameraRoll];
 }
 
 - (void)useCameraRoll {
@@ -90,9 +96,11 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         
         if (self.before) {
             self.imageViewBefore.image = image;
+            //self.pose.before = image;
             [self.imageViewBefore setHidden:NO];
         } else {
             self.imageViewAfter.image = image;
+            //self.pose.after = image;
             [self.imageViewAfter setHidden:NO];
         }
         if (self.imageViewBefore.image && self.imageViewAfter.image) {
@@ -126,12 +134,12 @@ finishedSavingWithError:(NSError *)error
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    if ([[segue identifier] isEqualToString:@"segueToMeld"]) {
-//        PoseViewController *nextVC = (PoseViewController *)[segue destinationViewController];
-//        nextVC.before = self.imageViewBefore.image;
-//        nextVC.after = self.imageViewAfter.image;
-//    }
-//}
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([[segue identifier] isEqualToString:@"segueToMeld"]) {
+        PoseViewController *nextVC = (PoseViewController *)[segue destinationViewController];
+        nextVC.pose = self.pose;
+        nextVC.managedObjectContext = self.managedObjectContext;
+    }
+}
 
 @end
