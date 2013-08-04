@@ -19,5 +19,5 @@
 - (void)nextDirection;
 - (void)switchImages;
 
-- (void)savePose;
+- (Pose *)savePose;
 @end

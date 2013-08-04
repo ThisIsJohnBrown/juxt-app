@@ -13,7 +13,7 @@
 #import <Social/Social.h>
 
 @interface PoseSelectionViewController ()
-@property (nonatomic, strong) NSArray *items;
+@property (nonatomic, strong) NSMutableArray *items;
 @end
 
 @implementation PoseSelectionViewController
@@ -43,15 +43,28 @@
                                               inManagedObjectContext:context];
     [fetchRequest setEntity:entity];
     NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
-    for (Pose *info in fetchedObjects) {
-//        NSLog(@"Name: %@", info.name);
-//        NSLog(@"Before: %@", info.beforePath);
-//        NSLog(@"Perc: %@", info.perc);
-        //info.direction = @"right";
+    
+    self.items = [fetchedObjects mutableCopy];
+    Pose *final = [self.items lastObject];
+    if (!final || final.beforePath) {
+        Pose *pose = [NSEntityDescription insertNewObjectForEntityForName:@"Pose" inManagedObjectContext:context];
+        pose.identifier = [self genRandStringLength:8];
+        [self.items addObject:pose];
     }
     
-    self.items = fetchedObjects;
+}
+
+NSString *letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+-(NSString *) genRandStringLength: (int) len {
     
+    NSMutableString *randomString = [NSMutableString stringWithCapacity: len];
+    
+    for (int i=0; i<len; i++) {
+        [randomString appendFormat: @"%C", [letters characterAtIndex: arc4random() % [letters length]]];
+    }
+    
+    return randomString;
 }
 
 - (void)didReceiveMemoryWarning
@@ -77,7 +90,7 @@
     
     Pose *pose = [self.items objectAtIndex:indexPath.row];
     cell.pose = pose;
-    [cell initUI];
+    [cell initUI:YES];
     
     return cell;
 }
@@ -113,7 +126,11 @@
     } else {
         NSAssert(NO, @"Unknown segue. All segues must be handled.");
     }
-    
+}
+
+- (CGFloat)tableView:(UITableView *)t heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    Pose *pose = [self.items objectAtIndex:indexPath.row];
+    return [pose.beforePath length] ? 320 : 104;
 }
 
 @end

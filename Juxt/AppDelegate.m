@@ -18,27 +18,23 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    
-//    NSManagedObjectContext *context = [self managedObjectContext];
-//    NSError *error;
-//    Pose *pose = [NSEntityDescription insertNewObjectForEntityForName:@"Pose" inManagedObjectContext:context];
-//    pose.name = @"Kitchen";
-//    pose.beforePath = @"before-die.jpg";
-//    pose.afterPath = @"after.png";
-//    pose.direction = @"horizontal";
-//    pose.perc = [NSNumber numberWithFloat: .25];
-//    
-//    Pose *pose2 = [NSEntityDescription insertNewObjectForEntityForName:@"Pose" inManagedObjectContext:context];
-//    pose2.name = @"Living Room";
-//    pose2.beforePath = @"before-die.jpg";
-//    pose2.afterPath = @"after.png";
-//    pose2.direction = @"right";
-//    pose2.perc = [NSNumber numberWithFloat: .5];
-//    
-//    if (![context save:&error]) {
-//        NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
-//    }
 
+    // Trace out all saved images
+    
+//    NSFileManager *fileMgr = [[NSFileManager alloc] init];
+//    NSError *error = nil;
+//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+//    NSString *documentsDirectory = [paths objectAtIndex:0];
+//    NSArray *directoryContents = [fileMgr contentsOfDirectoryAtPath:documentsDirectory error:&error];
+//    if (error == nil) {
+//        for (NSString *path in directoryContents) {
+//            NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:path];
+//            NSLog(@"%@", fullPath);
+//        }
+//    } else {
+//        // Error handling
+//        //...
+//    }
     
     // Override point for customization after application launch.
     UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;

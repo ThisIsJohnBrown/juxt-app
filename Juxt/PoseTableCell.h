@@ -15,5 +15,5 @@
 @property (nonatomic, strong) Pose *pose;
 
 - (void)updateUI;
-- (void)initUI;
+- (void)initUI:(BOOL)inTable;
 @end

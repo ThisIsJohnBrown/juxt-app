@@ -48,18 +48,23 @@
 //    
 //    NSLog(@"%@ -- %@", error, [error localizedDescription]);
     
-    self.imageViewBefore.image = [UIImage imageNamed:self.pose.beforePath];
-    self.imageViewAfter.image = [UIImage imageNamed:self.pose.afterPath];
+    if (self.pose.beforePath) {
+        self.imageViewBefore.image = [UIImage imageWithContentsOfFile:self.pose.beforePath];
+        [self.imageViewBefore setHidden:NO];
+    } if (self.pose.afterPath) {
+        self.imageViewAfter.image = [UIImage imageWithContentsOfFile:self.pose.afterPath];
+        [self.imageViewAfter setHidden:NO];
+    }
     
-    [self.imageViewBefore setHidden:NO];
-    [self.imageViewAfter setHidden:NO];
+    if (self.pose.beforePath && self.pose.afterPath) {
+        [self.readyButton setHidden:NO];
+    }
     
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
     [self.imageViewBefore addGestureRecognizer:tapRecognizer];
 }
 
 - (void)tap:(UITapGestureRecognizer *)recognizer {
-    NSLog(@"asdasdf");
     [self useCameraRoll];
 }
 
@@ -90,17 +95,33 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     
     [self dismissViewControllerAnimated:YES completion:nil];
     
-    NSLog(@"%@", mediaType);
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = info[UIImagePickerControllerOriginalImage];
         
+        NSData *imageData = UIImagePNGRepresentation(image);
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        
+        NSString *imagePath =[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-%@.png",self.pose.identifier, self.before ? @"b" : @"a"]];
+        
+        NSLog((@"pre writing to file"));
+        if (![imageData writeToFile:imagePath atomically:NO])
+        {
+            NSLog(@"Failed to cache image data to disk");
+        }
+        else
+        {
+            NSLog(@"the cachedImagedPath is %@",imagePath); 
+        }
+        
         if (self.before) {
             self.imageViewBefore.image = image;
-            //self.pose.before = image;
+            self.pose.beforePath = imagePath;
             [self.imageViewBefore setHidden:NO];
         } else {
             self.imageViewAfter.image = image;
-            //self.pose.after = image;
+            self.pose.afterPath = imagePath;
             [self.imageViewAfter setHidden:NO];
         }
         if (self.imageViewBefore.image && self.imageViewAfter.image) {
@@ -139,6 +160,11 @@ finishedSavingWithError:(NSError *)error
         PoseViewController *nextVC = (PoseViewController *)[segue destinationViewController];
         nextVC.pose = self.pose;
         nextVC.managedObjectContext = self.managedObjectContext;
+    } else if ([[segue identifier] isEqualToString:@"backToTable"]) {
+        if (!self.pose.createdDate) {
+            self.pose.afterPath = nil;
+            self.pose.beforePath = nil;
+        }
     }
 }
 

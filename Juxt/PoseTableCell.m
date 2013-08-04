@@ -18,11 +18,6 @@
 
 @implementation PoseTableCell
 
-- (Pose *)pose {
-    if (!_pose) _pose = [[Pose alloc] init];
-    return _pose;
-}
-
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -39,9 +34,20 @@
     // Configure the view for the selected state
 }
 
-- (void)initUI {
-    self.meldView = [[MeldView alloc] initWithPose:self.pose inFrame:CGRectMake(0, 0, 320, 320) withInteractions:NO];
-    [self addSubview: self.meldView];
+- (void)initUI:(BOOL)inTable {
+    self.selectionStyle = UITableViewCellSelectionStyleNone;
+    if (!self.pose.createdDate && inTable) {
+        CGRect frame = self.frame;
+        frame.size.height = 104;
+        self.frame = frame;
+        UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 120, 40)];
+        label.text = @"Add new pose";
+        [label setCenter:self.center];
+        [self addSubview:label];
+    } else {
+        self.meldView = [[MeldView alloc] initWithPose:self.pose inFrame:CGRectMake(40, 40, 240, 240) withInteractions:NO];
+        [self addSubview: self.meldView];
+    }
     self.accessoryType = UITableViewCellAccessoryNone;
     
 }

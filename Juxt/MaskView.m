@@ -103,23 +103,20 @@
         CGPathMoveToPoint(a_path, NULL, self.frame.size.width*(self.perc*2), 0);
         CGPathAddLineToPoint(a_path, NULL, self.frame.size.width*(self.perc*2), 0);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) - self.frame.size.width*(1-self.perc), self.bounds.size.height);
-        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) - self.frame.size.width*(1*self.perc), self.bounds.size.height);
-        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) - self.frame.size.width*(1*self.perc), 0);
-        //CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.bounds.size.height);
-        //CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc*2), self.bounds.size.height);
-        //CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, 0);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) + self.frame.size.width*(1-self.perc), self.bounds.size.height);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) + self.frame.size.width*(1-self.perc), 0);
     } else if ([self.direction isEqualToString:@"horizontal"]) {
-        CGPathMoveToPoint(a_path, NULL, 0, 0);
-        CGPathAddLineToPoint(a_path, NULL,0, 0);
-        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, 0);
-        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.frame.size.height*(self.perc));
+        CGPathMoveToPoint(a_path, NULL, 0, self.frame.size.height*(self.perc));
         CGPathAddLineToPoint(a_path, NULL,0, self.frame.size.height*(self.perc));
-    } else if ([self.direction isEqualToString:@"vertical"]) {
-        CGPathMoveToPoint(a_path, NULL, 0, 0);
-        CGPathAddLineToPoint(a_path, NULL,0, 0);
-        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc), 0);
-        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc), self.frame.size.height);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.frame.size.height*(self.perc));
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.frame.size.height);
         CGPathAddLineToPoint(a_path, NULL,0, self.frame.size.height);
+    } else if ([self.direction isEqualToString:@"vertical"]) {
+        CGPathMoveToPoint(a_path, NULL, self.frame.size.width*(self.perc), 0);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc), 0);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, 0);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.frame.size.height);
+        CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc), self.frame.size.height);
     }
     
     

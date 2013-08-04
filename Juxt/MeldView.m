@@ -44,7 +44,7 @@
     if ((self = [super initWithFrame:frame])) {
         self.pose = pose;
         self.hasInteractions = interactions;
-        
+        self.opaque = NO;
     }
     return self;
 }
@@ -57,9 +57,25 @@
     [self.masker nextDirection];
 }
 
-- (void)savePose {
+- (Pose *)savePose {
     self.pose.perc = [NSNumber numberWithFloat:self.maskPercentage];
     self.pose.direction = self.masker.direction;
+    CGRect frame = self.beforeImageView.frame;
+    NSLog(@"%f, %f, %f", self.frame.size.width, frame.size.width, self.frame.size.width/frame.size.width);
+    self.pose.beforeScale = [NSNumber numberWithFloat:
+                       self.frame.size.width/frame.size.width];
+    self.pose.beforeOffsetX = [NSNumber numberWithFloat:
+                               -(self.beforeImageView.center.x - self.beforeImageView.frame.size.width/2)/self.frame.size.width];
+    self.pose.beforeOffsetY = [NSNumber numberWithFloat:
+                               -(self.beforeImageView.center.y - self.beforeImageView.frame.size.height/2)/self.frame.size.width];
+    frame = self.afterImageView.frame;
+    self.pose.afterScale = [NSNumber numberWithFloat:
+                             self.frame.size.width/frame.size.width];
+    self.pose.afterOffsetX = [NSNumber numberWithFloat:
+                              -(self.afterImageView.center.x - self.afterImageView.frame.size.width/2)/self.frame.size.width];
+    self.pose.afterOffsetY = [NSNumber numberWithFloat:
+                              -(self.afterImageView.center.y - self.afterImageView.frame.size.height/2)/self.frame.size.width];
+    return self.pose;
 }
 
 - (void)switchImages {
@@ -84,98 +100,111 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    self.beforeHolderView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,320)];
-    self.beforeHolderView.clipsToBounds = YES;
-    [self addSubview:self.beforeHolderView];
-    if ([self.pose.beforePath length] != 0) {
-        self.beforeImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:self.pose.beforePath]];
-    }
-    //[NSData dataWithContentsOfURL:[NSURL URLWithString:url_Img_FULLurl_Img_FULL]]
-    self.beforeImageView.userInteractionEnabled = YES;
-    self.beforeImageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.beforeImageView.image.size};
-    [self.beforeHolderView addSubview:self.beforeImageView];
-    
-    self.afterHolderView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,320)];
-    self.afterHolderView.clipsToBounds = YES;
-    [self addSubview:self.afterHolderView];
-    if (self.pose.afterPath) {
-        self.afterImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:self.pose.afterPath]];
-    }
-    self.afterImageView.userInteractionEnabled = YES;
-    self.afterImageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.afterImageView.image.size};
-    [self.afterHolderView addSubview:self.afterImageView];
-    
-    if (self.pose.beforePath) {
-        float widthRatio = self.beforeImageView.bounds.size.width / self.beforeImageView.image.size.width;
-        float heightRatio = self.beforeImageView.bounds.size.height / self.beforeImageView.image.size.height;
-        float scale = MAX(widthRatio, heightRatio);
-        float imageWidth = scale * self.beforeImageView.image.size.width;
-        float imageHeight = scale * self.beforeImageView.image.size.height;
-        self.beforeImageView.frame = CGRectMake(0, 0, imageWidth, imageHeight);
+    if (!self.pose.beforePath) {
         
-        CGRect scrollViewFrame = self.beforeHolderView.frame;
-        CGFloat scaleWidth = scrollViewFrame.size.width / self.beforeImageView.frame.size.width;
-        CGFloat scaleHeight = scrollViewFrame.size.height / self.beforeImageView.frame.size.height;
+                              
+    } else {
+        self.beforeHolderView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.frame.size.width,self.frame.size.height)];
+        self.beforeHolderView.clipsToBounds = YES;
+        [self addSubview:self.beforeHolderView];
+        if ([self.pose.beforePath length] != 0) {
+            self.beforeImageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:self.pose.beforePath]];
+        }
+        //[NSData dataWithContentsOfURL:[NSURL URLWithString:url_Img_FULLurl_Img_FULL]]
+        self.beforeImageView.userInteractionEnabled = YES;
+        self.beforeImageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.beforeImageView.image.size};
+        [self.beforeHolderView addSubview:self.beforeImageView];
         
-        CGRect t = self.beforeImageView.frame;
-        CGFloat multiplier = scaleWidth < scaleHeight ? scaleHeight : scaleWidth;
-        self.beforeImageView.frame = CGRectMake(t.origin.x, t.origin.y, t.size.width*multiplier, t.size.height*multiplier);
-    }
-    
-    // widthRatio = self.afterImageView.bounds.size.width / self.afterImageView.image.size.width;
-    // heightRatio = self.afterImageView.bounds.size.height / self.afterImageView.image.size.height;
-    // scale = MAX(widthRatio, heightRatio);
-    // imageWidth = scale * self.afterImageView.image.size.width;
-    // imageHeight = scale * self.afterImageView.image.size.height;
-    // self.afterImageView.frame = CGRectMake(0, 0, imageWidth, imageHeight);
-    
-    // scrollViewFrame = self.afterHolderView.frame;
-    // scaleWidth = scrollViewFrame.size.width / self.afterImageView.frame.size.width;
-    // scaleHeight = scrollViewFrame.size.height / self.afterImageView.frame.size.height;
-    
-    // t = self.afterImageView.frame;
-    // multiplier = scaleWidth < scaleHeight ? scaleHeight : scaleWidth;
-    // self.afterImageView.frame = CGRectMake(t.origin.x, t.origin.y, t.size.width*multiplier, t.size.height*multiplier);
-    
-    self.masker = [[MaskView alloc] initWithPerc:[self.pose.perc floatValue] andDirection:self.pose.direction];
-    self.masker.frame = self.afterHolderView.frame;
-    [self addSubview:self.masker];
-    [self.afterHolderView.layer setMask:self.masker.layer];
-    
-    self.meldOverlayView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,320)];
-    self.meldOverlayView.opaque = NO;
-    self.meldOverlayView.backgroundColor = [UIColor clearColor];
-    [self addSubview:self.meldOverlayView];
-    
-    if (self.hasInteractions) {
-        UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
-        [self.meldOverlayView addGestureRecognizer:panRecognizer];
+        self.afterHolderView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.frame.size.width,self.frame.size.height)];
+        self.afterHolderView.clipsToBounds = YES;
+        [self addSubview:self.afterHolderView];
+        if (self.pose.afterPath) {
+            self.afterImageView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:self.pose.afterPath]];
+        }
+        self.afterImageView.userInteractionEnabled = YES;
+        self.afterImageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.afterImageView.image.size};
+        [self.afterHolderView addSubview:self.afterImageView];
         
-        UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinch:)];
-        [self.meldOverlayView addGestureRecognizer:pinchRecognizer];
+        NSLog(@"%f, %@, %f, %f",
+              self.beforeImageView.image.size.width,
+              self.pose.beforeScale,
+              self.frame.size.width,
+              self.beforeImageView.image.size.width * [self.pose.beforeScale floatValue] * (self.frame.size.width/self.beforeImageView.image.size.width));
+              
         
-        UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
-        [self.meldOverlayView addGestureRecognizer:tapRecognizer];
+        [self setInitScale:self.pose.beforeScale
+                     image:self.beforeImageView
+                      path:self.pose.beforePath
+                   offsetX:self.pose.beforeOffsetX
+                   offsetY:self.pose.beforeOffsetY];
+        
+        [self setInitScale:self.pose.afterScale
+                     image:self.afterImageView
+                      path:self.pose.afterPath
+                   offsetX:self.pose.afterOffsetX
+                   offsetY:self.pose.afterOffsetY];
+        
+        
+        self.masker = [[MaskView alloc] initWithPerc:[self.pose.perc floatValue] andDirection:self.pose.direction];
+        self.masker.frame = self.afterHolderView.frame;
+        [self addSubview:self.masker];
+        [self.afterHolderView.layer setMask:self.masker.layer];
+        
+        self.meldOverlayView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.frame.size.width,self.frame.size.height)];
+        self.meldOverlayView.opaque = NO;
+        self.meldOverlayView.backgroundColor = [UIColor clearColor];
+        [self addSubview:self.meldOverlayView];
+        
+        if (self.hasInteractions) {
+            UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+            [self.meldOverlayView addGestureRecognizer:panRecognizer];
+            
+            UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(pinch:)];
+            [self.meldOverlayView addGestureRecognizer:pinchRecognizer];
+            
+            UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap:)];
+            [self.meldOverlayView addGestureRecognizer:tapRecognizer];
+        }
     }
     
 //    [self initHolder:self.beforeHolderView withImage:self.pose.before inImageView:self.beforeImageView];
 //    [self initHolder:self.afterHolderView withImage:self.pose.after inImageView:self.afterImageView];
-    
-    
-//    self.masker = [[MaskView alloc] init];
-//    self.masker.frame = self.afterHolderView.frame;
-//    [self addSubview:self.masker];
-//    [self.afterHolderView.layer setMask:self.masker.layer];
-//    
-//    self.meldOverlayView = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,320)];
-//    self.meldOverlayView.opaque = NO;
-//    self.meldOverlayView.backgroundColor = [UIColor clearColor];
-//    [self addSubview:self.meldOverlayView];
 
 }
 
+- (void)setInitScale:(NSNumber *)scale image:(UIImageView *)image path:(NSString *)path offsetX:(NSNumber *)offsetX offsetY:(NSNumber *)offsetY {
+    if (path) {
+        float ratio = image.image.size.width / image.image.size.height;
+        float widthRatio = image.bounds.size.width / image.image.size.width;
+        float heightRatio = image.bounds.size.height / image.image.size.height;
+        float scaleMax = MAX(widthRatio, heightRatio);
+        float imageWidth = scaleMax * image.image.size.width;
+        float imageHeight = scaleMax * image.image.size.height;
+        image.frame = CGRectMake(0, 0, imageWidth, imageHeight);
+        
+        CGRect scrollViewFrame = self.beforeHolderView.frame;
+        CGFloat scaleWidth = scrollViewFrame.size.width / image.frame.size.width;
+        CGFloat scaleHeight = scrollViewFrame.size.height / image.frame.size.height;
+        
+        CGRect t = image.frame;
+        CGFloat multiplier = scaleWidth < scaleHeight ? scaleHeight : scaleWidth;
+        image.frame = CGRectMake(t.origin.x, t.origin.y, t.size.width*multiplier, t.size.height*multiplier);
+        
+        if ([scale floatValue] == 1){
+            
+        } else {
+            
+            image.frame = CGRectMake(
+                                     -self.frame.size.width*[offsetX floatValue],
+                                     -self.frame.size.height*[offsetY floatValue],
+                                     self.frame.size.width/[scale floatValue],
+                                     self.frame.size.height/[scale floatValue]/ratio);
+        }
+    }
+}
+
 - (void)initHolder:(UIView *)holder withImage:(UIImage *)image inImageView:(UIImageView *)imageView {
-    holder = [[UIView alloc] initWithFrame:CGRectMake(0,0,320,320)];
+    holder = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.frame.size.width,self.frame.size.height)];
     holder.clipsToBounds = YES;
     [self addSubview:holder];
     imageView = [[UIImageView alloc] initWithImage:image];
@@ -203,15 +232,7 @@
     }
     if (self.selectedImage) {
         CGPoint translation = [recognizer translationInView:self];
-        float newX = self.selectedImage.frame.origin.x + translation.x > 0 ? self.selectedImage.frame.size.width/2 : self.selectedImage.center.x + translation.x;
-        if (newX < self.selectedImage.frame.size.width/2 + (self.meldOverlayView.frame.size.width - self.selectedImage.frame.size.width)) {
-            newX = self.selectedImage.frame.size.width/2 + (self.meldOverlayView.frame.size.width - self.selectedImage.frame.size.width);
-        }
-        float newY = self.selectedImage.frame.origin.y + translation.y > 0 ? self.selectedImage.frame.size.height/2 : self.selectedImage.center.y + translation.y;
-        if (newY < self.selectedImage.frame.size.height/2 + (self.meldOverlayView.frame.size.height - self.selectedImage.frame.size.height)) {
-            newY = self.selectedImage.frame.size.height/2 + (self.meldOverlayView.frame.size.height - self.selectedImage.frame.size.height);
-        }
-        self.selectedImage.center = CGPointMake(newX, newY);
+        [self centerSelectedImage:translation];
         [recognizer setTranslation:CGPointMake(0, 0) inView:self.selectedImage];
     } else {
         if (recognizer.state == UIGestureRecognizerStateChanged) {
@@ -248,10 +269,25 @@
         } else {
             self.selectedImage.transform = CGAffineTransformScale(self.selectedImage.transform, recognizer.scale, recognizer.scale);
         }
-        //NSLog(@"%f, %f, %f", self.selectedImage.frame.size.width, self.selectedImage.frame.size.width*recognizer.scale, self.beforeImageWidth);
-        
         recognizer.scale = 1;
+        
+        [self centerSelectedImage:CGPointMake(0, 0)];
     }
+}
+
+- (void)centerSelectedImage:(CGPoint)offset {
+    CGRect frame = self.selectedImage.frame;
+    float newX = frame.origin.x + offset.x > 0 ? frame.size.width/2 : self.selectedImage.center.x + offset.x;
+    float minHorizontal = frame.size.width/2 + (self.meldOverlayView.frame.size.width - frame.size.width);
+    if (newX < minHorizontal) {
+        newX = minHorizontal;
+    }
+    float newY = frame.origin.y + offset.y > 0 ? frame.size.height/2 : self.selectedImage.center.y + offset.y;
+    float minVertical =  frame.size.height/2 + (self.meldOverlayView.frame.size.height - frame.size.height);
+    if (newY < minVertical) {
+        newY = minVertical;
+    }
+    self.selectedImage.center = CGPointMake(newX, newY);
 }
 
 - (void)tap:(UITapGestureRecognizer *)recognizer {
@@ -259,7 +295,6 @@
     float offset = [self getGestureOffset:pointInView];
     
     [self setSelectedImage:recognizer withOffset:offset];
-    NSLog(@"-- %f", offset);
 }
 
 - (float)getGestureOffset:(CGPoint)pointInView {
@@ -267,11 +302,11 @@
     if ([self.masker.direction isEqualToString:@"left"]) {
         offset = (pointInView.x - ((self.maskPercentage*2-1)*self.frame.size.width)) - pointInView.y;
     } else if ([self.masker.direction isEqualToString:@"right"]) {
-        offset = -((pointInView.x - ((self.maskPercentage*2)*self.frame.size.width)) + pointInView.y);
+        offset = (pointInView.x - ((self.maskPercentage*2)*self.frame.size.width)) + pointInView.y;
     } else if ([self.masker.direction isEqualToString:@"horizontal"]) {
-        offset = -(pointInView.y - self.maskPercentage*self.frame.size.height);
+        offset = pointInView.y - self.maskPercentage*self.frame.size.height;
     } else if ([self.masker.direction isEqualToString:@"vertical"]) {
-        offset = -(pointInView.x - self.maskPercentage*self.frame.size.width);
+        offset = pointInView.x - self.maskPercentage*self.frame.size.width;
     }
     
     return offset;

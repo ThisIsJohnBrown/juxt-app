@@ -52,7 +52,9 @@
 - (IBAction)save:(UIButton *)sender {
     NSManagedObjectContext *context = self.managedObjectContext;
     NSError *error;
-    [self.meldView savePose];
+    Pose *tempPose = [self.meldView savePose];
+    tempPose.createdDate = [[NSDate alloc] init];
+    tempPose.updatedDate = [[NSDate alloc] init];
     
     if (![context save:&error]) {
         NSLog(@"Whoops, couldn't save: %@", [error localizedDescription]);
@@ -90,7 +92,7 @@
 {
     [super viewDidLoad];
     
-    self.meldView = [[MeldView alloc] initWithPose:self.pose inFrame:CGRectMake(0, 0, 320, 320) withInteractions:YES];
+    self.meldView = [[MeldView alloc] initWithPose:self.pose inFrame:CGRectMake(20, 20, 280, 280) withInteractions:YES];
     [self.view addSubview:self.meldView];
 }
 
