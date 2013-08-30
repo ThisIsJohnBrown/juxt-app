@@ -19,7 +19,10 @@ UINavigationControllerDelegate>
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewBefore;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAfter;
 @property (weak, nonatomic) IBOutlet UIButton *readyButton;
+@property (strong, nonatomic) IBOutlet UIButton *deleteButton;
+@property (strong, nonatomic) IBOutlet UIButton *saveButton;
 
 @property (nonatomic, strong) Pose *pose;
+- (IBAction)saveSingle:(id)sender;
 
 @end

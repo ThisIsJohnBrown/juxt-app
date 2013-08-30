@@ -2,7 +2,7 @@
 //  Pose.m
 //  Juxt
 //
-//  Created by John Brown on 8/3/13.
+//  Created by John Brown on 8/11/13.
 //  Copyright (c) 2013 John Brown. All rights reserved.
 //
 
@@ -11,20 +11,26 @@
 
 @implementation Pose
 
-@dynamic direction;
-@dynamic beforePath;
-@dynamic afterPath;
-@dynamic perc;
-@dynamic createdDate;
-@dynamic identifier;
-@dynamic updatedDate;
-@dynamic uploaded;
-@dynamic caption;
-@dynamic beforeScale;
-@dynamic beforeOffsetX;
-@dynamic beforeOffsetY;
 @dynamic afterOffsetX;
 @dynamic afterOffsetY;
+@dynamic afterPath;
 @dynamic afterScale;
+@dynamic beforeOffsetX;
+@dynamic beforeOffsetY;
+@dynamic beforePath;
+@dynamic beforeScale;
+@dynamic caption;
+@dynamic createdDate;
+@dynamic direction;
+@dynamic identifier;
+@dynamic perc;
+@dynamic ratio;
+@dynamic updatedDate;
+@dynamic uploaded;
+@dynamic uri;
+@dynamic name;
+@dynamic username;
+@dynamic shared;
+@dynamic draft;
 
 @end

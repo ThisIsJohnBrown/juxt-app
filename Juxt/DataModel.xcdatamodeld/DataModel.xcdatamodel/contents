@@ -11,13 +11,19 @@
         <attribute name="beforeScale" optional="YES" attributeType="Float" defaultValueString="1" syncable="YES"/>
         <attribute name="caption" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="createdDate" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="direction" optional="YES" attributeType="String" defaultValueString="left" syncable="YES"/>
+        <attribute name="direction" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="3" defaultValueString="1" syncable="YES"/>
+        <attribute name="draft" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="identifier" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="perc" optional="YES" attributeType="Float" defaultValueString="0.5" syncable="YES"/>
+        <attribute name="ratio" optional="YES" attributeType="Integer 16" minValueString="1" maxValueString="3" defaultValueString="1" syncable="YES"/>
+        <attribute name="shared" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="updatedDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="uploaded" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="uri" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Pose" positionX="-13761" positionY="-2682" width="128" height="268"/>
+        <element name="Pose" positionX="-13761" positionY="-2682" width="128" height="360"/>
     </elements>
 </model>

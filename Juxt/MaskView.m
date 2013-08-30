@@ -16,7 +16,7 @@
 
 @implementation MaskView
 
--(id)initWithPerc:(float)perc andDirection:(NSString *)direction {
+-(id)initWithPerc:(float)perc andDirection:(NSNumber *)direction {
     if ((self = [super init])) {
         self.perc = perc;
         self.direction = direction;
@@ -31,16 +31,19 @@
     return _directions;
 }
 
-- (NSString *)direction {
+- (NSNumber *)direction {
     if (!_direction) {
-        _direction = @"left";
+        _direction = [NSNumber numberWithInt:1];
     }
     return _direction;
 }
 
 - (void)nextDirection {
-    int index = [self.directions indexOfObject:self.direction] + 1;
-    self.direction = self.directions[index < self.directions.count ? index : 0];
+    int newDirection = [self.direction intValue] + 1;
+    if (newDirection > 3) {
+        newDirection = 0;
+    }
+    self.direction = [NSNumber numberWithInt:newDirection];
     [self redraw:self.perc];
 }
 
@@ -93,25 +96,25 @@
     
     
     //Add a polygon to the path
-    if ([self.direction isEqualToString:@"left"]) {
+    if ([self.direction intValue] == 0) {
         CGPathMoveToPoint(a_path, NULL, self.frame.size.width*(self.perc) - self.frame.size.width*(1-self.perc), 0);
         CGPathAddLineToPoint(a_path, NULL, self.frame.size.width*(self.perc) - self.frame.size.width*(1-self.perc), 0);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, 0);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.bounds.size.height);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc*2), self.bounds.size.height);
-    } else if ([self.direction isEqualToString:@"right"]) {
+    } else if ([self.direction intValue] == 2) {
         CGPathMoveToPoint(a_path, NULL, self.frame.size.width*(self.perc*2), 0);
         CGPathAddLineToPoint(a_path, NULL, self.frame.size.width*(self.perc*2), 0);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) - self.frame.size.width*(1-self.perc), self.bounds.size.height);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) + self.frame.size.width*(1-self.perc), self.bounds.size.height);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc) + self.frame.size.width*(1-self.perc), 0);
-    } else if ([self.direction isEqualToString:@"horizontal"]) {
+    } else if ([self.direction intValue] == 3) {
         CGPathMoveToPoint(a_path, NULL, 0, self.frame.size.height*(self.perc));
         CGPathAddLineToPoint(a_path, NULL,0, self.frame.size.height*(self.perc));
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.frame.size.height*(self.perc));
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, self.frame.size.height);
         CGPathAddLineToPoint(a_path, NULL,0, self.frame.size.height);
-    } else if ([self.direction isEqualToString:@"vertical"]) {
+    } else if ([self.direction intValue] == 1) {
         CGPathMoveToPoint(a_path, NULL, self.frame.size.width*(self.perc), 0);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width*(self.perc), 0);
         CGPathAddLineToPoint(a_path, NULL,self.frame.size.width, 0);

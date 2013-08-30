@@ -14,10 +14,15 @@
 @property (strong, nonatomic) Pose *pose;
 
 -(id)initWithPose:(Pose *)pose inFrame:(CGRect)frame withInteractions:(BOOL)interactions;
+- (float)getGestureOffset:(CGPoint)pointInView;
 
 - (void)afterOpacity:(float)opacity;
 - (void)nextDirection;
 - (void)switchImages;
+- (void)changeRatio;
+- (void)updateUI;
+
+@property (nonatomic) BOOL needsRedraw;
 
 - (Pose *)savePose;
 @end

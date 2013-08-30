@@ -22,6 +22,7 @@
 - (IBAction)switchImages:(UIButton *)sender;
 - (IBAction)changeDirection:(UIButton *)sender;
 - (IBAction)save:(UIButton *)sender;
+- (IBAction)ratio:(UIButton *)sender;
 
 @property (strong, nonatomic) MeldView *meldView;
 

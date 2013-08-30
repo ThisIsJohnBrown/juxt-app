@@ -7,8 +7,9 @@
 //
 
 #import "AppDelegate.h"
-#import "PoseSelectionViewController.h"
+#import "Base64.h"
 #import "Pose.h"
+#import "TestFlight.h"
 
 @implementation AppDelegate
 
@@ -18,29 +19,56 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
-    // Trace out all saved images
     
-//    NSFileManager *fileMgr = [[NSFileManager alloc] init];
-//    NSError *error = nil;
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//    NSString *documentsDirectory = [paths objectAtIndex:0];
-//    NSArray *directoryContents = [fileMgr contentsOfDirectoryAtPath:documentsDirectory error:&error];
-//    if (error == nil) {
-//        for (NSString *path in directoryContents) {
-//            NSString *fullPath = [documentsDirectory stringByAppendingPathComponent:path];
-//            NSLog(@"%@", fullPath);
-//        }
-//    } else {
-//        // Error handling
-//        //...
-//    }
+//    [TestFlight setDeviceIdentifier:[[UIDevice currentDevice] uniqueIdentifier]];
+    [TestFlight takeOff:@"7106beab-b089-455e-ace2-db518ec92d9f"];
     
     // Override point for customization after application launch.
-    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-    PoseSelectionViewController *controller = (PoseSelectionViewController *)navigationController.topViewController;
-    controller.managedObjectContext = self.managedObjectContext;
+//    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+//    PoseSelectionViewController *controller = (PoseSelectionViewController *)navigationController.topViewController;
+//    controller.managedObjectContext = self.managedObjectContext;
+    
+//    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//    [defaults setObject:@"" forKey:@"username"];
+//    [defaults setObject:@"2f2ccbae1f1d5be84ebc81255a941999e286af26" forKey:@"apiKey"];
+//    [defaults synchronize];
+
+    //[[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleBlackOpaque];
+    
+    self.window.backgroundColor = [self colorFromHexString:@"#df473d"];
+    
     return YES;
+}
+
+- (void)fetchedData:(NSData *)responseData {
+    //parse out the json data
+    NSLog(@"%@", responseData);
+    NSError* error;
+    NSDictionary* json = [NSJSONSerialization
+                          JSONObjectWithData:responseData //1
+                          
+                          options:kNilOptions
+                          error:&error];
+    
+    NSArray* latestLoans = [json objectForKey:@"meta"]; //2
+    
+    NSLog(@"loans: %@", latestLoans); //3
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{
+    NSLog(@"Did fail with error %@" , [error localizedDescription]);
+}
+
+-(void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response{
+    NSHTTPURLResponse *httpResponse;
+    httpResponse = (NSHTTPURLResponse *)response;
+    int statusCode = [httpResponse statusCode];
+    NSLog(@"Status code was %d", statusCode);
+}
+
+-   (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)theData{
+    NSLog(@"String sent from server %@",[[NSString alloc] initWithData:theData encoding:NSUTF8StringEncoding]);
+    
 }
 							
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -163,6 +191,14 @@
 - (NSURL *)applicationDocumentsDirectory
 {
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}
+
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
 }
 
 @end
